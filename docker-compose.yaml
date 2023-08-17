@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  api-bookhub:
+    build: .
+    entrypoint: sh ./.docker/entrypoint.sh
+    container_name: api-bookhub
+    ports:
+      - 3033:3033
+    volumes:
+      - ./:/home/app/bookhub
+    tty: true
+    networks:
+      - bookhub-network
+
+  db:
+    image: mongo:4.4
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - /mongodb/dbdata:/data/db
+      - /mongodb/configdb:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    environment:
+      MONGO_INITDB_DATABASE: bookhub
+    networks:
+      - bookhub-network
+
+networks:
+  bookhub-network:
+    driver: bridge
